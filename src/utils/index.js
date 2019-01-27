@@ -1,24 +1,24 @@
-function formatNumber (n) {
-  const str = n.toString()
-  return str[1] ? str : `0${str}`
-}
-
-export function formatTime (date) {
-  const year = date.getFullYear()
-  const month = date.getMonth() + 1
-  const day = date.getDate()
-
-  const hour = date.getHours()
-  const minute = date.getMinutes()
-  const second = date.getSeconds()
-
-  const t1 = [year, month, day].map(formatNumber).join('/')
-  const t2 = [hour, minute, second].map(formatNumber).join(':')
-
-  return `${t1} ${t2}`
-}
+// function hexios() {  }
+let defaultBaseUrl = 'https://autumnfish.cn/wx/'
 
 export default {
-  formatNumber,
-  formatTime
+  get(options) {
+    // 处理url地址
+    if (options.url) {
+      options.url = defaultBaseUrl + options.url
+    }
+
+    return new Promise((resolve, reject) => {
+      wx.request({
+        url: options.url || 'url', //开发者服务器接口地址",
+        data: options.data || 'data', //请求的参数",
+        method: 'GET',
+        dataType: options.dataType || 'json', //如果设为json，会尝试对返回的数据做一次 JSON.parse
+        success: resolve,
+        fail: reject
+      });
+    })
+
+  },
+  post() {}
 }
