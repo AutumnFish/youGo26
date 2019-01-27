@@ -55,7 +55,7 @@
       </div>
       <!-- 选项区域 -->
       <div class="option-box">
-        <div class="option">
+        <div class="option" @click="getAddress">
           <div class="left">收货地址管理</div>
           <div class="right">
             <i class="iconfont icon-jiantouyou"></i>
@@ -64,7 +64,7 @@
       </div>
       <div class="option-box">
         <div class="option">
-          <div class="left">联系客服</div>
+          <div class="left" @click="callKF">联系客服</div>
           <div class="right">400-618-4000</div>
         </div>
         <div class="option">
@@ -98,6 +98,27 @@ export default {
       // console.log(event);
       this.icon = event.mp.detail.userInfo.avatarUrl;
       this.info = event.mp.detail.userInfo.nickName;
+    },
+    // 地址获取
+    getAddress() {
+      wx.chooseAddress({
+        success(res) {
+          console.log(res.userName);
+          console.log(res.postalCode);
+          console.log(res.provinceName);
+          console.log(res.cityName);
+          console.log(res.countyName);
+          console.log(res.detailInfo);
+          console.log(res.nationalCode);
+          console.log(res.telNumber);
+        }
+      });
+    },
+    // 打电话给客服
+    callKF() {
+      wx.makePhoneCall({
+        phoneNumber: "15311110721" // 仅为示例，并非真实的电话号码
+      });
     }
   }
 };
