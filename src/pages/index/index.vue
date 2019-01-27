@@ -249,8 +249,6 @@ $uRed: #ff2d4a;
   color: #999999;
   font-size: 24rpx;
   margin-top: 20rpx;
-  i {
-  }
 }
 // 返回顶部
 .back-top {
