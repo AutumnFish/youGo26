@@ -67,7 +67,8 @@ export default {
     searchbox
   },
   // 初始化的时候 获取数据
-  async created() {
+  // async onLoad() {
+  async onShow() {
     // 轮播图数据
     // let swiperRes = await hxios.get({
     //   url: "api/public/v1/home/swiperdata"

@@ -16,19 +16,21 @@
       </scroll-view>
       <scroll-view class="right" scroll-y scroll-with-animation>
         <img class="title-img" src="/static/titleImage.png" alt>
-        <div class="section" v-for="level1 in categoryList[index].children" :key="level1.cat_id">
-          <div class="title">
-            <span>/</span>
-            &nbsp;&nbsp;&nbsp;&nbsp;{{level1.cat_name}}&nbsp;&nbsp;&nbsp;&nbsp;
-            <span>/</span>
-          </div>
-          <div class="items">
-            <div class="item" v-for="(level2,i) in level1.children" :key="level2.cat_id">
-              <img :src="'https://autumnfish.cn/wx/'+level2.cat_icon" alt>
-              <p>{{level2.cat_name}}</p>
+        <block v-if="categoryList.length!=0">
+          <div class="section" v-for="level1 in categoryList[index].children" :key="level1.cat_id">
+            <div class="title">
+              <span>/</span>
+              &nbsp;&nbsp;&nbsp;&nbsp;{{level1.cat_name}}&nbsp;&nbsp;&nbsp;&nbsp;
+              <span>/</span>
+            </div>
+            <div class="items">
+              <div class="item" v-for="(level2,i) in level1.children" :key="level2.cat_id">
+                <img :src="'https://autumnfish.cn/wx/'+level2.cat_icon" alt>
+                <p>{{level2.cat_name}}</p>
+              </div>
             </div>
           </div>
-        </div>
+        </block>
       </scroll-view>
     </div>
   </div>
@@ -52,7 +54,8 @@ export default {
   components: {
     searchbox
   },
-  async created() {
+  // async created() {
+  async onLoad() {
     let res = await hxios.get({
       url: "api/public/v1/categories"
     });
@@ -66,6 +69,11 @@ export default {
 $uRed: #ff2d4a;
 page {
   height: 100%;
+}
+::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  color: transparent;
 }
 .category-container {
   padding-top: 100rpx;
