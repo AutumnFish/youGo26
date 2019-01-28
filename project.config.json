@@ -10,7 +10,7 @@
 	"miniprogramRoot": "dist/wx/",
 	"compileType": "miniprogram",
 	"appid": "wxf38fa8abade84a24",
-	"projectname": "youGo",
+	"projectname": "youGo2019-1-28",
 	"condition": {
 		"search": {
 			"current": -1,
@@ -29,12 +29,18 @@
 			"list": []
 		},
 		"miniprogram": {
-			"current": 0,
+			"current": 1,
 			"list": [
 				{
 					"id": -1,
 					"name": "去我的",
-					"pathName": "pages/mine/main"
+					"pathName": "pages/mine/main",
+					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "去分类",
+					"pathName": "pages/category/main"
 				}
 			]
 		}

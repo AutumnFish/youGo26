@@ -4,6 +4,11 @@
     <div class="header">
       <div class="icon-box">
         <i class="iconfont icon-shezhi"></i>
+        <!-- bindgetuserinfo
+            bind 小程序的事件绑定关键字  
+            @
+            mpvue的官方文档中 说明了 bind->@
+         -->
         <button open-type="getUserInfo" @getuserinfo="getUserInfo">
           <img :src="icon" alt>
         </button>

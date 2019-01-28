@@ -1,9 +1,7 @@
 <template>
   <div class="index-container">
-    <div class="search-box">
-      <input type="text" placeholder="搜索">
-      <icon type="search" size="12"></icon>
-    </div>
+    <!-- 使用组件 -->
+    <searchbox></searchbox>
     <!-- 轮播图 -->
     <div class="swiper-container">
       <swiper indicator-dots autoplay circular indicator-active-color="#0094ff">
@@ -49,6 +47,8 @@
 <script>
 // 导入hxios模块
 import hxios from "../../utils/index.js";
+// 导入组件
+import searchbox from "../../components/searchBox.vue";
 export default {
   data() {
     return {
@@ -61,6 +61,10 @@ export default {
       // 是否显示回到顶部
       isShow: false
     };
+  },
+  // 注册组件
+  components: {
+    searchbox
   },
   // 初始化的时候 获取数据
   async created() {
@@ -106,21 +110,21 @@ export default {
   // 滚动事件
   onPageScroll(event) {
     // console.log(event);
-    if(event.scrollTop>170){
-      this.isShow=true;
-    }else{
-      this.isShow=false;
+    if (event.scrollTop > 170) {
+      this.isShow = true;
+    } else {
+      this.isShow = false;
     }
   },
   methods: {
     // 返回顶部
-    tTop(){
+    tTop() {
       wx.pageScrollTo({
         scrollTop: 0, //滚动到页面的目标位置（单位px）,
         duration: 300 //滚动动画的时长，默认300ms，单位 ms,
       });
     }
-  },
+  }
 };
 </script>
 
@@ -129,34 +133,7 @@ $uRed: #ff2d4a;
 .index-container {
   padding-top: 100rpx;
 }
-.search-box {
-  background: $uRed;
-  padding: 20rpx 16rpx;
-  box-sizing: border-box;
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100%;
-  z-index: 998;
-  input {
-    display: block;
-    width: 100%;
-    box-sizing: border-box;
-    padding-left: 376rpx;
-    background-color: white;
-    font-size: 24rpx;
-    height: 60rpx;
-    border-radius: 10rpx;
-  }
-  icon {
-    position: absolute;
-    // 父盒子
-    left: 50%;
-    top: 50%;
-    // 自己
-    transform: translate(-50%, -50%);
-  }
-}
+
 .swiper-container {
   swiper {
     height: 340rpx;
