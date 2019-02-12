@@ -10,7 +10,7 @@
 	"miniprogramRoot": "dist/wx/",
 	"compileType": "miniprogram",
 	"appid": "wxf38fa8abade84a24",
-	"projectname": "youGo2019-1-28",
+	"projectname": "youGo2019-2-11",
 	"condition": {
 		"search": {
 			"current": -1,

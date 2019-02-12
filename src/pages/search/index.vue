@@ -22,18 +22,19 @@
       </div>
       <div class="result-box" v-if="results.length!=0">
         <div class="filter-box">
-          <div class="filter active">综合</div>
-          <div class="filter">销量</div>
-          <div class="filter">价格
+          <div class="filter" :class="{active:orderIndex==0}" @click="orderIndex=0">综合</div>
+          <div class="filter" :class="{active:orderIndex==1}" @click="orderIndex=1">销量</div>
+          <div class="filter" :class="{active:orderIndex==2}" @click="orderIndex=2;isUp=!isUp">价格
             <div class="arrow-box">
-              <span>▲</span>
-              <span>▼</span>
+              <span :class="{active:isUp}">▲</span>
+              <span :class="{active:!isUp}">▼</span>
             </div>
           </div>
         </div>
         <!-- 商品盒子 -->
         <div class="goods-box">
-          <div class="item" v-for="(item, index) in results" :key="item.goods_id">
+          <!-- 替换为计算属性 -->
+          <div class="item" v-for="(item, index) in comResults" :key="item.goods_id" @click="toDetail(item.goods_id)">
             <div class="left">
               <img :src="item.goods_small_logo" alt>
             </div>
@@ -62,8 +63,51 @@ export default {
       // 搜索数组
       searchList: [],
       // 搜索结果数组
-      results: []
+      results: [],
+      // 记录排序条件的索引 0,1,2
+      orderIndex: 0,
+      // 价格升降序
+      isUp: true
     };
+  },
+  computed: {
+    // 排序数组 根据标记变量
+    comResults() {
+      switch (this.orderIndex) {
+        // 综合 0
+        case 0:
+          // 返回原始数组
+          return this.results;
+          break;
+        // 销量 1
+        case 1:
+          // 不能直接用原数组排序
+          // let newArr = this.results;
+          // 新数组 来排序 新数组跟原始数组一样
+          // 拷贝新数组 arr->string->newArr
+          let newArr = JSON.parse(JSON.stringify(this.results));
+          return newArr.sort((a, b) => {
+            // 返回一个值
+            return a.goods_id - b.goods_id;
+          });
+          break;
+        // 价格 2 升降
+        case 2:
+          newArr = JSON.parse(JSON.stringify(this.results));
+          return newArr.sort((a, b) => {
+            // 返回一个值
+            // return a.goods_id - b.goods_id;
+            if (this.isUp) {
+              return a.goods_price - b.goods_price;
+            } else {
+              return b.goods_price - a.goods_price;
+            }
+          });
+          break;
+        default:
+          break;
+      }
+    }
   },
   methods: {
     // 查询数据
@@ -116,6 +160,11 @@ export default {
       this.inputValue = value;
       // 查询数据
       this.searchData();
+    },
+    // 去详情页
+    toDetail(goods_id){
+      // 代码跳转
+      wx.navigateTo({ url: '/pages/detail/main?goods_id='+goods_id });
     }
   },
   // created 只要保证data有了即可
@@ -223,6 +272,15 @@ $uRed: #ff2d4a;
       font-size: 30rpx;
       &.active {
         color: $uRed;
+        // 父元素有active 自己才要亮
+        .arrow-box {
+          span {
+            // // 高亮的时候 变红
+            &.active {
+              color: $uRed;
+            }
+          }
+        }
       }
       &:last-child {
         display: flex;
@@ -232,6 +290,11 @@ $uRed: #ff2d4a;
           span {
             display: block;
             transform: scaleY(0.6);
+            color: black;
+            // // 高亮的时候 变红
+            // &.active{
+            //   color:$uRed;
+            // }
           }
         }
       }
