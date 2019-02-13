@@ -63,7 +63,7 @@
         <span class="iconfont icon-gouwuche"></span>
         购物车
       </div>
-      <button>加入购物车</button>
+      <button @click="add2Cart">加入购物车</button>
       <button>立即购买</button>
     </div>
   </div>
@@ -152,6 +152,51 @@ export default {
       // 对于tabbar管理的页面不能够使用 navigateTo跳转
       // wx.navigateTo({ url: "/pages/cart/main" });
       wx.switchTab({ url: "/pages/cart/main" });
+    },
+    // 加入购物车
+    add2Cart() {
+      // 读取缓存
+      wx.getStorage({
+        key: "cart",
+        success: res => {
+          console.log(res.data);
+          // 判断是否存在
+          // 存在 累加
+          if (res.data[this.goodsDetail.goods_id]) {
+            // 已经存在这个商品
+            res.data[this.goodsDetail.goods_id]++;
+          } else {
+            // 没有添加这个商品
+            res.data[this.goodsDetail.goods_id] = 1;
+          }
+          // 缓存起来
+          wx.setStorage({
+            key: "cart",
+            data: res.data
+          });
+        },
+        fail: () => {
+          // 没有东西
+          // 不存在 新增
+          let cartData = {};
+          cartData[this.goodsDetail.goods_id] = 1;
+          // 重新保存到缓存中
+          wx.setStorage({
+            key: "cart",
+            data: cartData
+          });
+        },
+        complete: () => {
+          // 统一提示用户
+          wx.showToast({
+            title: "添加成功", //提示的内容,
+            icon: "success", //图标,
+            duration: 2000, //延迟时间,
+            mask: true, //显示透明蒙层，防止触摸穿透,
+            success: res => {}
+          });
+        }
+      });
     }
   }
 };
