@@ -46,7 +46,7 @@
                     <span>{{item.goods_price}}</span>.00
                   </div>
                   <div class="right">
-                    <span @click="item.goods_num--">-</span>
+                    <span @click="item.goods_num>1?item.goods_num--:item.goods_num">-</span>
                     <span>{{item.goods_num}}</span>
                     <span @click="item.goods_num++">+</span>
                   </div>
@@ -54,6 +54,23 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+      <!-- 底部操纵区域 -->
+      <div class="bottom-box">
+        <div class="left">
+          <input type="radio" :checked="isCheckAll" @click="checkAll">
+          全选
+        </div>
+        <div class="right">
+          <div class="total-price">
+            <div class="top">
+              ¥
+              <span>{{totalPrice}}</span>.00
+            </div>
+            <div class="bottom">商家包邮</div>
+          </div>
+          <button :class="{disabled:totalNum==0}" @click="createOrder">结算({{totalNum}})</button>
         </div>
       </div>
     </div>
@@ -101,6 +118,85 @@ export default {
           });
         }
       });
+    },
+    // 点击全选
+    checkAll() {
+      // 把所有商品的选中状态 变得跟 自己一样
+      console.log(this.isCheckAll);
+      // 人为触发 isCheckAll的set方法
+      this.isCheckAll = !this.isCheckAll;
+    },
+    // 创建订单
+    async createOrder() {
+      if (this.totalNum != 0) {
+        // 判断登录
+        let token = wx.getStorageSync("token");
+        console.log(token);
+        if (token) {
+          // 准备数据 商品信息
+          let goods = this.goodsList.map(v => {
+            return {
+              goods_id: v.goods_id,
+              goods_number: v.goods_num,
+              goods_price: v.goods_price
+            };
+          });
+          // 有token
+          // 创建订单
+          let res = await hxios.post({
+            url: "api/public/v1/my/orders/create",
+            header: {
+              Authorization: token
+            },
+            data: {
+              order_price: this.totalPrice,
+              consignee_addr: this.address,
+              goods
+            }
+          });
+          // console.log(res);
+          // 获取支付信息
+          let payRes = await hxios.post({
+            url: "api/public/v1/my/orders/req_unifiedorder",
+            header: {
+              Authorization: token
+            },
+            data: {
+              order_number: res.data.message.order_number
+            }
+          });
+          // console.log(payRes);
+          // 调用微信小程序子代的api 发起支付
+          wx.requestPayment({
+            timeStamp: payRes.data.message.wxorder.timeStamp, //时间戳从1970年1月1日00:00:00至今的秒数,即当前的时间,
+            nonceStr: payRes.data.message.wxorder.nonceStr, //随机字符串，长度为32个字符以下,
+            package: payRes.data.message.wxorder.package, //统一下单接口返回的 prepay_id 参数值，提交格式如：prepay_id=*,
+            signType: payRes.data.message.wxorder.signType, //签名算法，暂支持 MD5,
+            paySign: payRes.data.message.wxorder.paySign, //签名,具体签名方案参见小程序支付接口文档,
+            success: res => {
+              // 付完了
+              console.log(res);
+            },
+            fail: () => {},
+            complete: () => {}
+          });
+        } else {
+          // 没有登录
+          // 去登录页
+          wx.showToast({
+            title: "哥们,先登录", //提示的内容,
+            icon: "warning", //图标,
+            duration: 2000, //延迟时间,
+            mask: true, //显示透明蒙层，防止触摸穿透,
+            success: res => {
+              // 去登录页
+              wx.switchTab({ url: "/pages/mine/main" });
+            }
+          });
+        }
+      } else {
+        // 什么都不敢 提示用户
+      }
     }
   },
   // 侦听器
@@ -122,6 +218,47 @@ export default {
         });
       },
       deep: true
+    }
+  },
+  // 计算属性
+  computed: {
+    // 全选
+    isCheckAll: {
+      // 赋值
+      set(value) {
+        this.goodsList.forEach(v => {
+          v.isSelected = value;
+        });
+      },
+      // 取值
+      get() {
+        // 返回布尔值 是否全部被选中了
+        return this.goodsList.every(v => {
+          return v.isSelected == true;
+        });
+      }
+    },
+    // 总金额
+    totalPrice() {
+      let price = 0;
+      this.goodsList.forEach(v => {
+        if (v.isSelected) {
+          price += v.goods_num * v.goods_price;
+        }
+      });
+      // 返回
+      return price;
+    },
+    // 总数
+    totalNum() {
+      let num = 0;
+      this.goodsList.forEach(v => {
+        if (v.isSelected) {
+          num += v.goods_num;
+        }
+      });
+      // 返回
+      return num;
     }
   },
   // 每次显示都会触发
@@ -216,6 +353,7 @@ page {
     }
   }
   .full {
+    padding-bottom: 100rpx;
   }
 }
 // 收货人信息布局
@@ -335,6 +473,58 @@ page {
             }
           }
         }
+      }
+    }
+  }
+}
+// 底部操纵区域布局
+.bottom-box {
+  height: 100rpx;
+  display: flex;
+  justify-content: space-between;
+  padding-left: 30rpx;
+  align-items: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: white;
+  .left {
+    font-size: 30rpx input {
+      margin-right: 30rpx;
+    }
+  }
+  .right {
+    display: flex;
+    .total-price {
+      .top {
+        color: #eb4450;
+        font-size: 28rpx;
+        // 伪元素
+        &::before {
+          content: "合计:";
+          color: black;
+        }
+        span {
+          font-size: 30rpx;
+        }
+      }
+      .bottom {
+        font-size: 28rpx;
+        color: #ccc;
+      }
+    }
+    button {
+      margin-left: 20rpx;
+      width: 230rpx;
+      background-color: #eb4450;
+      color: white;
+      text-align: center;
+      line-height: 100rpx;
+      border-radius: 0;
+      &.disabled {
+        background-color: #ccc;
+        color: black;
       }
     }
   }

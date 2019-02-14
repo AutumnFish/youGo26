@@ -8,7 +8,7 @@
             bind 小程序的事件绑定关键字  
             @
             mpvue的官方文档中 说明了 bind->@
-         -->
+        -->
         <button open-type="getUserInfo" @getuserinfo="getUserInfo">
           <img :src="icon" alt>
         </button>
@@ -90,6 +90,8 @@
 </template>
 
 <script>
+// 导入hxios
+import hxios from "../../utils/index.js";
 export default {
   data() {
     return {
@@ -103,6 +105,40 @@ export default {
       // console.log(event);
       this.icon = event.mp.detail.userInfo.avatarUrl;
       this.info = event.mp.detail.userInfo.nickName;
+      // 第三方登录 获取更为私密的信息
+      wx.login({
+        success: res => {
+          // console.log(res);
+          // 用户登录凭证
+          let code = res.code;
+          // 获取用户更为私密的信息
+          wx.getUserInfo({
+            withCredentials: true,
+            success: async userRes => {
+              // console.log(userRes);
+              // 私密信息
+              let encryptedData = userRes.encryptedData;
+              let iv = userRes.iv;
+              let rawData = userRes.rawData;
+              let signature = userRes.signature;
+              // 调用自己服务器的登录接口
+              let loginRes = await hxios.post({
+                url: "api/public/v1/users/wxlogin",
+                data: {
+                  code,
+                  encryptedData,
+                  iv,
+                  rawData,
+                  signature
+                }
+              });
+              // console.log(loginRes);
+              // 保存token
+              wx.setStorageSync("token", loginRes.data.message.token);
+            }
+          });
+        }
+      });
     },
     // 地址获取
     getAddress() {
