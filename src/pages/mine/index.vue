@@ -37,7 +37,7 @@
         </div>
       </div>
       <!-- 订单 -->
-      <div class="order-box">
+      <a class="order-box" href="/pages/order/main">
         <div class="title">我的订单</div>
         <div class="bottom">
           <div class="item">
@@ -57,7 +57,7 @@
             全部订单
           </div>
         </div>
-      </div>
+      </a>
       <!-- 选项区域 -->
       <div class="option-box">
         <div class="option" @click="getAddress">
@@ -222,6 +222,8 @@ page {
   }
   .order-box {
     margin-top: 20rpx;
+    display: block;
+    background-color: white;
     .title {
       height: 90rpx;
       border-bottom: 1rpx solid #aaa;

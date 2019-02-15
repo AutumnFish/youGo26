@@ -57,7 +57,7 @@
     <div class="bottom-box">
       <div class="service">
         <span class="iconfont icon-kefu"></span>
-        联系客服
+        <button open-type="contact" @contact="handleContact">联系客服</button>
       </div>
       <div class="cart" @click="toCart">
         <span class="iconfont icon-gouwuche"></span>
@@ -197,6 +197,11 @@ export default {
           });
         }
       });
+    },
+    // 跟客服聊天
+    handleContact(e) {
+      console.log(e.path);
+      console.log(e.query);
     }
   }
 };

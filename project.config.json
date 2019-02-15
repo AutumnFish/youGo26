@@ -11,7 +11,7 @@
 	"miniprogramRoot": "dist/wx/",
 	"compileType": "miniprogram",
 	"appid": "wxfb52f2d7b2f6123a",
-	"projectname": "yog2019-2-13",
+	"projectname": "yog2019-2-15",
 	"condition": {
 		"search": {
 			"current": -1,

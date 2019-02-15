@@ -1,12 +1,11 @@
 <script>
 export default {
   created() {
-    // 调用API从本地缓存中获取数据
-    const logs = wx.getStorageSync("logs") || [];
-    logs.unshift(Date.now());
-    wx.setStorageSync("logs", logs);
-
-    console.log("app created and cache logs by setStorageSync");
+    // 注册网络状态改变事件
+    wx.onNetworkStatusChange(function(res) {
+      console.log(res.isConnected);
+      console.log(res.networkType);
+    });
   }
 };
 </script>

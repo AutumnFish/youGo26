@@ -74,6 +74,7 @@
         </div>
       </div>
     </div>
+   
   </div>
 </template>
 
@@ -133,13 +134,16 @@ export default {
         let token = wx.getStorageSync("token");
         console.log(token);
         if (token) {
-          // 准备数据 商品信息
-          let goods = this.goodsList.map(v => {
-            return {
-              goods_id: v.goods_id,
-              goods_number: v.goods_num,
-              goods_price: v.goods_price
-            };
+          // 准备数据 商品信息 选中的商品
+          let goods = [];
+          this.goodsList.forEach(v => {
+            if (v.isSelected == true) {
+              goods.push({
+                goods_id: v.goods_id,
+                goods_number: v.goods_num,
+                goods_price: v.goods_price
+              });
+            }
           });
           // 有token
           // 创建订单
@@ -154,8 +158,18 @@ export default {
               goods
             }
           });
+          // 删除购买的元素
+          for (let i = this.goodsList.length - 1; i >= 0; i--) {
+            if (this.goodsList[i].isSelected == true) {
+              this.goodsList.splice(i, 1);
+            }
+          }
+          // 如果没有商品为空车
+          if (this.goodsList.length == 0) {
+            this.isFull = false;
+          }
           // console.log(res);
-          // 获取支付信息
+          // 获取支付信息(生成预支付信息)
           let payRes = await hxios.post({
             url: "api/public/v1/my/orders/req_unifiedorder",
             header: {
@@ -197,7 +211,8 @@ export default {
       } else {
         // 什么都不敢 提示用户
       }
-    }
+    },
+ 
   },
   // 侦听器
   watch: {
@@ -206,16 +221,24 @@ export default {
         // console.log("改变啦");
         // 同步更新到缓存中即可
         // goods_id:个数
-        let data = {};
-        // 提取出数据
-        this.goodsList.forEach(v => {
-          data[v.goods_id] = v.goods_num;
-        });
-        // 覆盖缓存即可
-        wx.setStorage({
-          key: "cart",
-          data
-        });
+        // 判断是否为空
+        if (this.goodsList.length == 0) {
+          wx.removeStorage({
+            key: "cart",
+            success: res => {}
+          });
+        } else {
+          let data = {};
+          // 提取出数据
+          this.goodsList.forEach(v => {
+            data[v.goods_id] = v.goods_num;
+          });
+          // 覆盖缓存即可
+          wx.setStorage({
+            key: "cart",
+            data
+          });
+        }
       },
       deep: true
     }
